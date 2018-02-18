@@ -283,10 +283,15 @@ module.exports = function () {
    * this on executes after a failure to take a screen shot of the page
    */
   this.After(function (scenario) {
-    if (scenario.isFailed) {
+    let jsonFile = path.resolve(global.reportsPath, 'KlassiTech-report.json');
+    if (scenario.isFailed()) {
       return driver.saveScreenshot().then(function (screenShot) {
-        scenario.attach(new Buffer(screenShot, 'base64'), 'image/png');
+        scenario.attach(screenShot, 'image/png');
+          scenario.attach(JSON.stringify(jsonFile, undefined, 4));
       })
+      // return driver.saveScreenshot().then(function (screenShot) {
+      //     scenario.attach(new Buffer(screenShot, 'base64'), 'image/png');
+      // })
     }
     
   });
@@ -295,4 +300,9 @@ module.exports = function () {
   
   
 };
-
+//
+// var world = this;
+//
+// driver.takeScreenshot().then(function (buffer) {
+//     return world.attach(buffer, 'image/png');
+// };

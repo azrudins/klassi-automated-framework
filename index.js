@@ -63,38 +63,46 @@ global.browserName = program.browser;
  */
 global.pageObjectPath = path.resolve(program.pageObjects);
 
-/** used within world.js to output reports
+/**
+ * used within world.js to output reports
  */
 global.reportsPath = path.resolve(program.reports);
 
-/** used within world.js to import shared objects into the shared namespace
+/**
+ * used within world.js to import shared objects into the shared namespace
  * @type {any}
  */
 global.sharedObjectPaths = program.sharedObjects.map(function(item){
     return path.resolve(item);
 });
 
-/** used within world.js to decide if reports should be generated
+/**
+ * used within world.js to decide if reports should be generated
  */
 global.disableReport = (program.disableReport);
 
-/** rewrite command line switches for cucumber
+/**
+ * rewrite command line switches for cucumber
  */
 process.argv.splice(2, 100);
 
-/** add switch to tell cucumber to produce json report files
+/**
+ * add switch to tell cucumber to produce json report files
  */
 process.argv.push('-f', 'json:' + path.resolve(__dirname, global.reportsPath, global.reportName + '-' + date + '.json'));
 
-/** add cucumber world as first required script (this sets up the globals)
+/**
+ * add cucumber world as first required script (this sets up the globals)
  */
 process.argv.push('-r', path.resolve(__dirname, './runtime/world.js'));
 
-/** add path to import step definitions
+/**
+ * add path to import step definitions
  */
 process.argv.push('-r', path.resolve(program.steps));
 
-/** add tag to the scenarios
+/**
+ * add tag to the scenarios
  */
 if (program.tags) {
     process.argv.push('-t', program.tags);
@@ -103,7 +111,7 @@ if (program.tags) {
 /**
  * add strict option (fail if there are any undefined or pending steps)
  */
-// process.argv.push('-S');
+// process.argv.push('-s');
 
 /**
  * execute cucumber Cli

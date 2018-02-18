@@ -1,6 +1,6 @@
 
 Given('The user arrives on the duckduckgo search page', function () {
-    helpers.loadPage(shared.searchData.url, 10);
+    // helpers.loadPage(shared.searchData.url, 10);
 });
 
 When('they input space {int}', function (int, callback) {

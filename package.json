@@ -1,7 +1,7 @@
 {
   "name": "webdriverio-cucumber-js",
   "version": "2.0.0",
-  "description":"A debuggable JS BDD framework using webdriver.io, nodeJs and cucumber-js, complete with built-in API testing",
+  "description": "A debuggable JS BDD framework using webdriver.io, nodeJs and cucumber-js, complete with built-in API testing",
   "Author": {
     "name": "Larry Goddard",
     "email": "larryg@klassitech.co.uk",
@@ -47,7 +47,7 @@
     "chalk": "^2.3.0",
     "chromedriver": "^2.33.2",
     "commander": "^2.11.0",
-    "cucumber": "^3.2.1",
+    "cucumber": "^4.0.0",
     "cucumber-html-reporter": "^3.0.4",
     "fs-extra-promise": "^1.0.1",
     "fs-plus": "^3.0.1",
