@@ -20,7 +20,6 @@ module.exports = {
       /** return the promise of an element to the following then */
       return driver.element(shared.searchData.elem.resultLink).then(function(elements){
           /** verify this element has children */
-          console.log(elements);
           expect(elements.length).to.not.equal(0);
       }).then(function(){
           // return helpers.cssImages('search')

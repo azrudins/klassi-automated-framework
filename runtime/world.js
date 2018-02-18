@@ -1,6 +1,7 @@
 /**
- * KlassiTech Automated Testing Tool
+ * Klassi Automated Testing Tool
  * Created by Larry Goddard
+ * Contributors:
  */
 'use strict';
 
@@ -8,12 +9,10 @@
  * it is responsible for setting up and exposing the driver/browser/expect/assert etc required within each step definition
  */
 const fs = require('fs-plus'),
-  fse = require('fs-extra-promise'),
   path = require('path'),
   requireDir = require('require-dir'),
   merge = require('merge'),
   chalk = require('chalk'),
-  dir = require('node-dir'),
   assert = require('chai').assert,
   expect = require('chai').expect,
   reporter = require('cucumber-html-reporter'),
@@ -21,44 +20,16 @@ const fs = require('fs-plus'),
   webdriverio = require('webdriverio'),
   webdrivercss = require('webdrivercss-custom-v4-compatible');
 
-/**
- * Create the download and docs folder for storing all files
- * @type {string}
- */
-let fileDnldFldr = ('./shared-objects/fileDnldFolder/'),
-    docsFolder = ('./shared-objects/docs'),
-    fileName = path.join('./shared-objects/docs/fileName.txt');
-
-    fse.ensureDir(fileDnldFldr, function (err) {
-        if(err){
-            log.error('The File Download Folder has NOT been created: ' + err.stack);
-        }
-    });
-    fse.ensureDir(docsFolder,  function (err) {
-        if(err){
-            log.error('The Docs Folder has NOT been created: ' + err.stack);
-        }
-    });
-    fse.ensureFile(fileName, function (err) {
-        if(err){
-            log.error('The fileName File has NOT been created: ' + err.stack);
-        }
-    });
 
 /**
  * for the Logging feature
  */
-global.logger = require('../runtime/logger');
+const logger = require('../runtime/logger');
 
 /**
  * for the environment variables
  */
 global.envConfig = require('../runtime/envConfig.json');
-
-/**
- *  for the Download of all file types
- */
-global.downloader = require('../runtime/downloader.js');
 
 /**
  * for all assertions for variable testing
@@ -75,7 +46,7 @@ let PhantomJsDriver = require('./phantomJsDriver'),
   FirefoxDriver = require('./firefoxDriver');
 
 /**
- * createUrl the web browser based on global let set in index.js
+ * create the web browser based on global let set in index.js
  * @returns {{}}
  */
 function getDriverInstance() {
@@ -113,10 +84,10 @@ function getDriverInstance() {
 }
 
 /**
- * Global timeout 60 seconds default
+ * Global timeout
  * @type {number}
  */
-global.DEFAULT_TIMEOUT = 60 * 1000;
+global.DEFAULT_TIMEOUT = 60 * 1000; // 30 seconds default
 
 function consoleInfo(){
     let args = [].slice.call(arguments),
@@ -125,14 +96,21 @@ function consoleInfo(){
 }
 
 /**
+ * This is the Global date time functionality
+ */
+function myDate(){
+  let sysDate = new Date();
+  let date;
+  sysDate.setDate(sysDate.getDate());
+  date = ('-' + '0' + sysDate.getDate()).slice(-2) + '-' + ('0' + (sysDate.getMonth()+1)).slice(-2) + '-' + sysDate.getFullYear();
+  
+}
+
+/**
  * All Global variables
  * @constructor
  */
 function World(){
-    /**
-     * This is the Global date functionality
-     */
-    let date = helpers.currentDate();
 
   /**
    * Adding logging
@@ -140,26 +118,24 @@ function World(){
   let log = logger.oupLog();
 
   /**
-   * createUrl a list of variables to expose globally and therefore accessible within each step definition
+   * create a list of variables to expose globally and therefore accessible within each step definition
    * @type {{driver: null, webdriverio, webdrivercss: *, expect: *, assert: (*), trace: consoleInfo,
    * log: log, page: {}, shared: {}}}
    */
   let runtime = {
-    driver: null,                 // the browser object
-    webdriverio: webdriverio,     // the raw webdriverio driver module, providing access to static properties/methods
-    webdrivercss: webdrivercss,   // the raw webdrivercss driver function
-    expect: global.expect,        // expose chai expect to allow variable testing
-    assert: global.assert,        // expose chai assert to allow variable testing
-    fs: fs,                       // expose fs (file system) for use globally
-    dir: dir,                     // expose dir for getting an array of files, subdirectories or both
-    trace: consoleInfo,           // expose an info method to log output to the console in a readable/visible format
-    page: [],                     // empty page objects placeholder
-    shared: {},                   // empty shared objects placeholder
-    log: log,                     // expose the log method for output to files for emailing
-    envConfig: global.envConfig,  // expose the global environment configuration file for use when changing environment types (i.e. dev, test, preprod)
-    downloader: global.downloader,// exposes the downloader for global usage
-    request: rp,                  // exposes the request-promise for API testing
-    date: date,                   // expose the date method for logs and reports
+    driver: null,               // the browser object
+    webdriverio: webdriverio,   // the raw webdriverio driver module, providing access to static properties/methods
+    webdrivercss: webdrivercss, // the raw webdrivercss driver function
+    expect: global.expect,      // expose chai expect to allow variable testing
+    assert: global.assert,      // expose chai assert to allow variable testing
+    fs: fs,                     // expose fs (file system) for use globally
+    trace: consoleInfo,         // expose an info method to log output to the console in a readable/visible format
+    page: [],                   // empty page objects placeholder
+    shared: {},                 // empty shared objects placeholder
+    log: log,                   // expose the log method for output to files for emailing
+    envConfig: global.envConfig,// expose the global environment configuration file for use when changing environment types (i.e. dev, test, preprod)
+    request: rp,                // exposes the request-promise for API testing
+    date: myDate,               // expose the date method for logs and reports
   };
   
 /**
@@ -198,7 +174,9 @@ function World(){
      */
     global.sharedObjectPaths.forEach(function (itemPath){
       if (fs.existsSync(itemPath)){
+
         let dir = requireDir(itemPath, { camelcase: true });
+
         merge(allDirs, dir);
       }
     });
@@ -216,15 +194,14 @@ function World(){
    * add helpers
    */
   global.helpers = require('../runtime/helpers.js');
-
+  
 }
 
-/**
- * export the "World" required by cucumber to allow it to expose methods within step def's
+/** export the "World" required by cucumber to allow it to expose methods within step def's
  */
 module.exports = function () {
   this.World = World;
-
+  
   /** set the default timeout for all tests
    */
   this.setDefaultTimeout(DEFAULT_TIMEOUT);
@@ -232,61 +209,90 @@ module.exports = function () {
   /**
    * ALL CUCUMBER HOOKS
    */
-  /**
-   * create the driver before scenario if it's not instantiated
+  /** create the driver before scenario if it's not instantiated
    */
-  this.registerHandler('BeforeScenario', function (){
+  this.registerHandler('BeforeScenario', function () {
     if (!global.driver) {
-      global.driver = getDriverInstance();
+      global.driver = getDriverInstance().then(function () {
+          /** sets the browser window size to maximum
+           */
+          driver.windowHandleMaximize(100);
+      }).init()
     }
     return driver;
   });
   
+
   /**
-   * compile and generate a report at the END of the test run and send an Email
+   * compile and generate a report at the END of the test run
    */
   this.registerHandler('AfterFeatures', function (features, done) {
     if (global.reportsPath && fs.existsSync(global.reportsPath)) {
       let reportOptions = {
         theme: 'bootstrap',
-        jsonFile: path.resolve(global.reportsPath, global.reportName + '-' + date + '.json'),
-        output: path.resolve(global.reportsPath, global.reportName + '-' + date + '.html'),
+        jsonFile: path.resolve(global.reportsPath, 'KlassiTech-report.json'),
+        output: path.resolve(global.reportsPath, 'KlassiTech-report.html'),
         reportSuiteAsScenarios: true,
         launchReport: (!global.disableReport),
         ignoreBadJsonFile: true,
         metadata: {
-          'Test Completion': (helpers.getCurrentDateTime()),
-          'Test Environment': 'DEVELOPMENT',
-          'Platform': 'AWS Debian 9',
-          'Executed': 'Remote'
-        },
-        brandTitle: global.reportName + '-' + date,
-        name: global.projectName
-      };
-      reporter.generate(reportOptions);
-          return helpers.klassiEmail();
+           // can be added if required
         }
+      };
+      reporter.generate(reportOptions)
+    }
       done();
-    });
+  });
   
-    /**
-   *  executed after each scenario (always closes the browser to ensure fresh tests)
+  /**
+   * add before scenario hook
    */
-  this.After(function(scenario){
-    if(scenario.isFailed()) {
-      /**
-       * add a screenshot to the error report
-       */
+  this.BeforeScenario(function(scenario, done) {
+    console.log('BeforeScenario: ' + scenario.getName());
+    done();
+  });
+  
+  /**
+   * add a before feature hook
+   */
+  this.BeforeFeature(function(feature, done) {
+    console.log('BeforeFeature: ' + feature.getName());
+    done();
+  });
+  
+  /**
+   * executed after each scenario (always closes the browser to ensure fresh tests)
+   */
+  this.AfterScenario(function(scenario, done) {
+    console.log('AfterScenario: ' + scenario.getName());
+    done();
+    // return driver.end();
+  });
+  
+  
+  /**
+   * add an after feature hook
+   */
+  this.AfterFeature(function(feature, done) {
+    console.log('AfterFeature: ' + feature.getName());
+    done();
+    // return driver.end();
+  });
+  
+  /**
+   * this on executes after a failure to take a screen shot of the page
+   */
+  this.After(function (scenario) {
+    if (scenario.isFailed) {
       return driver.saveScreenshot().then(function (screenShot) {
-          scenario.attach(new Buffer(screenShot, 'base64'), 'image/png');
-          return driver.pause(500).then(function () {
-              return driver.end()
-          })
+        scenario.attach(new Buffer(screenShot, 'base64'), 'image/png');
       })
     }
-       return driver.end();
+    
   });
   
   
   
+  
 };
+

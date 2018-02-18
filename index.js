@@ -10,6 +10,11 @@ const path = require('path'),
     pjson = require('./package.json'),
     cucumber = require('cucumber');
 
+const {Given, When, Then} = require('cucumber');
+    global.Given = Given;
+    global.When = When;
+    global.Then = Then;
+
 function collectPaths(value, paths){
   paths.push(value);
   return paths;
@@ -79,7 +84,7 @@ process.argv.splice(2, 100);
 
 /** add switch to tell cucumber to produce json report files
  */
-process.argv.push('-f', 'pretty', '-f', 'json:' + path.resolve(__dirname, global.reportsPath, global.reportName + '-' + date + '.json'));
+process.argv.push('-f', 'json:' + path.resolve(__dirname, global.reportsPath, global.reportName + '-' + date + '.json'));
 
 /** add cucumber world as first required script (this sets up the globals)
  */
@@ -98,25 +103,52 @@ if (program.tags) {
 /**
  * add strict option (fail if there are any undefined or pending steps)
  */
-process.argv.push('-S');
+// process.argv.push('-S');
 
 /**
  * execute cucumber Cli
  */
-let oupCli = cucumber.Cli(process.argv);
-global.cucumber = cucumber;
+// let oupCli = cucumber.Cli(process.argv);
+// global.cucumber = cucumber;
+//
+// oupCli.run(function (succeeded) {
+//     let code = succeeded ? 0 : 1;
+//     function exitNow() {
+//         process.exit(code);
+//     }
+//     if (process.stdout.write('')) {
+//         exitNow();
+//     } else {
+//         /**
+//          * write() returned false, kernel buffer is not empty yet...
+//          */
+//         process.stdout.on('drain', exitNow);
+//     }
+// });
 
-oupCli.run(function (succeeded) {
-    let code = succeeded ? 0 : 1;
-    function exitNow() {
-        process.exit(code);
-    }
-    if (process.stdout.write('')) {
-        exitNow();
-    } else {
-        /**
-         * write() returned false, kernel buffer is not empty yet...
-         */
-        process.stdout.on('drain', exitNow);
+
+// Cucumber V2.x
+//CLI *Constructor* requires an options object with argv, cwd and stdout
+global.cucumber = cucumber;
+// let {Given, When, Then} = require('cucumber');
+//     global.Given = Given;
+//     global.When = When;
+//     global.Then = Then;
+
+let cli = new (cucumber.Cli)(
+    {
+        argv: process.argv,
+        cwd: process.cwd(),
+        stdout: process.stdout
+    });
+
+return new Promise(function (resolve, reject) {
+    try {
+        return cli.run()
+        .then(success => resolve((success === true) ? 0 : 1));
+    } catch (err) {
+        return reject(err);
     }
 });
+
+
