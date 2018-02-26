@@ -10,11 +10,6 @@ const path = require('path'),
     pjson = require('./package.json'),
     cucumber = require('cucumber');
 
-const {Given, When, Then} = require('cucumber');
-    global.Given = Given;
-    global.When = When;
-    global.Then = Then;
-
 function collectPaths(value, paths){
   paths.push(value);
   return paths;
@@ -111,7 +106,7 @@ if (program.tags) {
 /**
  * add strict option (fail if there are any undefined or pending steps)
  */
-// process.argv.push('-s');
+// process.argv.push('-S');
 
 /**
  * execute cucumber Cli
@@ -135,15 +130,16 @@ if (program.tags) {
 // });
 
 
-// Cucumber V2.x
-//CLI *Constructor* requires an options object with argv, cwd and stdout
-global.cucumber = cucumber;
-// let {Given, When, Then} = require('cucumber');
-//     global.Given = Given;
-//     global.When = When;
-//     global.Then = Then;
+// // Cucumber V2.x
+// //CLI *Constructor* requires an options object with argv, cwd and stdout
+// global.cucumber = cucumber;
+let {Given, When, Then} = cucumber;
+global.Given = Given;
+global.When = When;
+global.Then = Then;
 
 let cli = new (cucumber.Cli)(
+    
     {
         argv: process.argv,
         cwd: process.cwd(),

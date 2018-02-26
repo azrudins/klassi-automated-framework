@@ -103,7 +103,7 @@ function myDate(){
   let date;
   sysDate.setDate(sysDate.getDate());
   date = ('-' + '0' + sysDate.getDate()).slice(-2) + '-' + ('0' + (sysDate.getMonth()+1)).slice(-2) + '-' + sysDate.getFullYear();
-  
+  return date;
 }
 
 /**
@@ -111,6 +111,10 @@ function myDate(){
  * @constructor
  */
 function World(){
+// function World({attach, parameters}) {
+//     this.attach = attach;
+//     this.parameters = parameters;
+
 
   /**
    * Adding logging
@@ -138,9 +142,9 @@ function World(){
     date: myDate,               // expose the date method for logs and reports
   };
   
-/**
- *  expose properties to step definition methods via global variables
-     */
+  /**
+   *  expose properties to step definition methods via global variables
+  */
   Object.keys(runtime).forEach(function (key){
     /** make property/method available as a global (no this. prefix required)
      */
@@ -227,72 +231,72 @@ module.exports = function () {
    * compile and generate a report at the END of the test run
    */
   this.registerHandler('AfterFeatures', function (features, done) {
-    if (global.reportsPath && fs.existsSync(global.reportsPath)) {
-      let reportOptions = {
-        theme: 'bootstrap',
-        jsonFile: path.resolve(global.reportsPath, 'KlassiTech-report.json'),
-        output: path.resolve(global.reportsPath, 'KlassiTech-report.html'),
-        reportSuiteAsScenarios: true,
-        launchReport: (!global.disableReport),
-        ignoreBadJsonFile: true,
-        metadata: {
-           // can be added if required
-        }
-      };
-      reporter.generate(reportOptions)
-    }
-      done();
+    // if (global.reportsPath && fs.existsSync(global.reportsPath)) {
+    //   let reportOptions = {
+    //     theme: 'bootstrap',
+    //     jsonFile: path.resolve(global.reportsPath, global.reportName + '-' + '.json'),
+    //     output: path.resolve(global.reportsPath, global.reportName + '-' + '.html'),
+    //     reportSuiteAsScenarios: true,
+    //     launchReport: (!global.disableReport),
+    //     ignoreBadJsonFile: true,
+    //     metadata: {
+    //        // can be added if required
+    //     }
+    //   };
+    //   reporter.generate(reportOptions)
+    // }
+    //   done();
   });
   
-  /**
-   * add before scenario hook
-   */
-  this.BeforeScenario(function(scenario, done) {
-    console.log('BeforeScenario: ' + scenario.getName());
-    done();
-  });
-  
-  /**
-   * add a before feature hook
-   */
-  this.BeforeFeature(function(feature, done) {
-    console.log('BeforeFeature: ' + feature.getName());
-    done();
-  });
-  
-  /**
-   * executed after each scenario (always closes the browser to ensure fresh tests)
-   */
-  this.AfterScenario(function(scenario, done) {
-    console.log('AfterScenario: ' + scenario.getName());
-    done();
-    // return driver.end();
-  });
-  
-  
-  /**
-   * add an after feature hook
-   */
-  this.AfterFeature(function(feature, done) {
-    console.log('AfterFeature: ' + feature.getName());
-    done();
-    // return driver.end();
-  });
+  // /**
+  //  * add before scenario hook
+  //  */
+  // this.BeforeScenario(function(scenario, done) {
+  //   console.log('BeforeScenario: ' + scenario.getName());
+  //   done();
+  // });
+  //
+  // /**
+  //  * add a before feature hook
+  //  */
+  // this.BeforeFeature(function(feature, done) {
+  //   console.log('BeforeFeature: ' + feature.getName());
+  //   done();
+  // });
+  //
+  // /**
+  //  * executed after each scenario (always closes the browser to ensure fresh tests)
+  //  */
+  // this.AfterScenario(function(scenario, done) {
+  //   console.log('AfterScenario: ' + scenario.getName());
+  //   done();
+  //   // return driver.end();
+  // });
+  //
+  //
+  // /**
+  //  * add an after feature hook
+  //  */
+  // this.AfterFeature(function(feature, done) {
+  //   console.log('AfterFeature: ' + feature.getName());
+  //   done();
+  //   // return driver.end();
+  // });
   
   /**
    * this on executes after a failure to take a screen shot of the page
    */
   this.After(function (scenario) {
-    let jsonFile = path.resolve(global.reportsPath, 'KlassiTech-report.json');
-    if (scenario.isFailed()) {
-      return driver.saveScreenshot().then(function (screenShot) {
-        scenario.attach(screenShot, 'image/png');
-          scenario.attach(JSON.stringify(jsonFile, undefined, 4));
-      })
-      // return driver.saveScreenshot().then(function (screenShot) {
-      //     scenario.attach(new Buffer(screenShot, 'base64'), 'image/png');
-      // })
-    }
+    // let jsonFile = path.resolve(global.reportsPath, global.reportName + '-' + '.json');
+    // if (scenario.isFailed()) {
+    //   return driver.saveScreenshot().then(function (screenShot) {
+    //     scenario.attach(screenShot, 'image/png');
+    //       // scenario.attach(JSON.stringify(this.jsonFile, undefined, 4));
+    //   })
+    //   // return driver.saveScreenshot().then(function (screenShot) {
+    //   //     scenario.attach(new Buffer(screenShot, 'base64'), 'image/png');
+    //   // })
+    // }
     
   });
   
